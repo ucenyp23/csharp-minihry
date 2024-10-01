@@ -1,4 +1,6 @@
-﻿namespace sibenice
+﻿using System.IO;
+
+namespace sibenice
 {
     internal class Program
     {
@@ -44,6 +46,12 @@
             if (new string(guessedWord) == wordToGuess)
             {
                 Console.WriteLine("Gratulace! Uhodl jsi slovo: " + wordToGuess);
+                Console.Write("Prosím, přidejte svoje slovo: ");
+                string inputWord = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(inputWord))
+                {
+                    File.AppendAllText("slova.txt", Environment.NewLine + inputWord);
+                }
             }
             else
             {

@@ -1,0 +1,10 @@
+kniha
+stul
+zidle
+auto
+dum
+pes
+kocka
+strom
+kvetina
+ucitel
