@@ -9,7 +9,7 @@
             string wordToGuess = words[random.Next(words.Length)];
             char[] guessedWord = new string('_', wordToGuess.Length).ToCharArray();
             List<char> incorrectGuesses = new List<char>();
-            int attempts = 6;
+            int attempts = 12;
 
             while (attempts > 0 && new string(guessedWord) != wordToGuess)
             {
