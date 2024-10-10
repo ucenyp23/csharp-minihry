@@ -1,5 +1,5 @@
-﻿using System.Numerics;
-using System.Runtime.ExceptionServices;
+﻿using System;
+using System.Numerics;
 
 namespace piskvorky
 {
@@ -7,61 +7,64 @@ namespace piskvorky
     {
         static void Main(string[] args)
         {
-            Random rnd = new Random();
-            int[] a = new int[3] { 0, 0, 0 };
-            int[] b = new int[3] { 0, 0, 0 };
-            int[] c = new int[3] { 0, 0, 0 };
-            int[][] board = new int[][] {a, b, c};
+            Console.Write("Enter board size (3-20): ");
+            int size = Convert.ToInt32(Console.ReadLine());
+            if (size < 3 || size > 20)
+            {
+                Console.WriteLine("Invalid board size. Please enter a number between 3 and 20.");
+                return;
+            }
+
+            int[][] board = new int[size][];
+            for (int i = 0; i < size; i++)
+            {
+                board[i] = new int[size];
+            }
+
+            int currentPlayer = 1;
 
             while (true)
             {
-                PrintBoard(board);
-                Console.Write("Input number of your next move (1-9): ");
+                PrintBoard(board, size);
+                Console.Write($"Player {currentPlayer}, input number of your next move (1-{size * size}): ");
                 int move = Convert.ToInt32(Console.ReadLine()) - 1;
 
-                int row = move / 3;
-                int col = move % 3;
+                int row = move / size;
+                int col = move % size;
 
-                if (move < 0 || move >= 9 || board[row][col] != 0)
+                if (move < 0 || move >= size * size || board[row][col] != 0)
                 {
                     Console.WriteLine("Invalid move, try again.");
                     continue;
                 }
 
-                board[row][col] = 1;
+                board[row][col] = currentPlayer;
 
-                int rowai = rnd.Next(0, 3);
-                int colai = rnd.Next(0, 3);
+                int winCondition = size >= 6 ? 5 : size;
 
-                board[rowai][colai] = 2;
-
-                if (CheckWin(board, 1))
+                if (CheckWin(board, size, winCondition, currentPlayer))
                 {
-                    PrintBoard(board);
-                    Console.WriteLine("You, win!");
+                    PrintBoard(board, size);
+                    Console.WriteLine($"Player {currentPlayer} wins!");
                     break;
                 }
 
-                if (CheckWin(board, 2))
+                if (IsBoardFull(board, size))
                 {
-                    PrintBoard(board);
-                    Console.WriteLine("You, lost!");
-                    break;
-                }
-
-                if (IsBoardFull(board))
-                {
-                    PrintBoard(board);
+                    PrintBoard(board, size);
                     Console.WriteLine("It's a draw!");
                     break;
                 }
+
+                currentPlayer = 3 - currentPlayer;  // Switch player: if 1 then 2, if 2 then 1
             }
         }
-        static void PrintBoard(int[][] board)
+
+        static void PrintBoard(int[][] board, int size)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < size; i++)
             {
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < size; j++)
                 {
                     if (board[i][j] == 0)
                     {
@@ -79,28 +82,53 @@ namespace piskvorky
                 Console.WriteLine();
             }
         }
-        static bool CheckWin(int[][] board, int player)
+
+        static bool CheckWin(int[][] board, int size, int winCondition, int player)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < size; i++)
             {
-                if (board[i][0] == player && board[i][1] == player && board[i][2] == player)
-                    return true;
-                if (board[0][i] == player && board[1][i] == player && board[2][i] == player)
-                    return true;
+                for (int j = 0; j <= size - winCondition; j++)
+                {
+                    bool winRow = true;
+                    bool winCol = true;
+                    for (int k = 0; k < winCondition; k++)
+                    {
+                        if (board[i][j + k] != player)
+                            winRow = false;
+                        if (board[j + k][i] != player)
+                            winCol = false;
+                    }
+                    if (winRow || winCol)
+                        return true;
+                }
             }
 
-            if (board[0][0] == player && board[1][1] == player && board[2][2] == player)
-                return true;
-            if (board[0][2] == player && board[1][1] == player && board[2][0] == player)
-                return true;
+            for (int i = 0; i <= size - winCondition; i++)
+            {
+                for (int j = 0; j <= size - winCondition; j++)
+                {
+                    bool winDiag1 = true;
+                    bool winDiag2 = true;
+                    for (int k = 0; k < winCondition; k++)
+                    {
+                        if (board[i + k][j + k] != player)
+                            winDiag1 = false;
+                        if (board[i + k][j + winCondition - 1 - k] != player)
+                            winDiag2 = false;
+                    }
+                    if (winDiag1 || winDiag2)
+                        return true;
+                }
+            }
 
             return false;
         }
-        static bool IsBoardFull(int[][] board)
+
+        static bool IsBoardFull(int[][] board, int size)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < size; i++)
             {
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < size; j++)
                 {
                     if (board[i][j] == 0)
                         return false;
