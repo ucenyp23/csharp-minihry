@@ -5,25 +5,49 @@
         static void Main(string[] args)
         {
             Random rnd = new Random();
-            Console.Write("Input (stone, paper, scisors): ");
-            string x = Console.ReadLine();
-            int y = rnd.Next(0, 3);
+            int playerWins = 0;
+            int aiWins = 0;
 
-            if ((x == "stone" && y == 2) || (x == "paper" && y == 0) || (x == "scisors" && y == 1))
+            string[] options = { "stone", "paper", "scissors" };
+
+            while (playerWins < 2 && aiWins < 2)
             {
-                Console.WriteLine("You Won!");
+                Console.Write("Input (stone, paper, scissors): ");
+                string x = Console.ReadLine().ToLower();
+                int y = rnd.Next(0, 3);
+
+                string aiChoice = options[y];
+                Console.WriteLine($"AI chose: {aiChoice}");
+
+                if (x == aiChoice)
+                {
+                    Console.WriteLine("Draw!");
+                }
+                else if ((x == "stone" && aiChoice == "scissors") || (x == "paper" && aiChoice == "stone") || (x == "scissors" && aiChoice == "paper"))
+                {
+                    Console.WriteLine("You won this round!");
+                    playerWins++;
+                }
+                else if ((x == "stone" && aiChoice == "paper") || (x == "paper" && aiChoice == "scissors") || (x == "scissors" && aiChoice == "stone"))
+                {
+                    Console.WriteLine("You lost this round!");
+                    aiWins++;
+                }
+                else
+                {
+                    Console.WriteLine("Incorrect input!");
+                }
+
+                Console.WriteLine($"Score: You {playerWins} - {aiWins} AI");
             }
-            else if ((x == "stone" && y == 0) || (x == "paper" && y == 1) || (x == "scisors" && y == 2))
+
+            if (playerWins == 2)
             {
-                Console.WriteLine("Draw!");
-            }
-            else if ((x == "stone" && y == 1) || (x == "paper" && y == 2) || (x == "scisors" && y == 0))
-            {
-                Console.WriteLine("You Lost!");
+                Console.WriteLine("Congratulations! You won the game!");
             }
             else
             {
-                Console.WriteLine("Incorect input!");
+                Console.WriteLine("Sorry! You lost the game.");
             }
         }
     }
