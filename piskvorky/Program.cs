@@ -56,7 +56,7 @@ namespace piskvorky
                     break;
                 }
 
-                currentPlayer = 3 - currentPlayer;  // Switch player: if 1 then 2, if 2 then 1
+                currentPlayer = 3 - currentPlayer;
             }
         }
 

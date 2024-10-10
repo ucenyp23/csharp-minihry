@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace sibenice
 {
@@ -11,8 +14,30 @@ namespace sibenice
             string wordToGuess = words[random.Next(words.Length)];
             char[] guessedWord = new string('_', wordToGuess.Length).ToCharArray();
             List<char> incorrectGuesses = new List<char>();
-            int attempts = 12;
+            string[] difficultyLevels = new string[3] { "easy", "medium", "hard" };
 
+            string difficulty = "";
+            while (!Array.Exists(difficultyLevels, element => element == difficulty))
+            {
+                Console.Write("Choose difficulty (easy, medium, hard): ");
+                difficulty = Console.ReadLine().ToLower();
+            }
+
+            int attempts;
+            switch (difficulty)
+            {
+                case "easy":
+                    attempts = 15;
+                    break;
+                case "hard":
+                    attempts = 8;
+                    break;
+                default:
+                    attempts = 12;
+                    break;
+            }
+
+            bool hintUsed = false;
             while (attempts > 0 && new string(guessedWord) != wordToGuess)
             {
                 Console.Clear();
@@ -20,8 +45,24 @@ namespace sibenice
                 Console.WriteLine("Slovo: " + new string(guessedWord));
                 Console.WriteLine("Špatné pokusy: " + string.Join(", ", incorrectGuesses));
                 Console.WriteLine("Zbývající pokusy: " + attempts);
-                Console.Write("Hádej písmeno: ");
-                char guess = Console.ReadLine()[0];
+                Console.WriteLine("Hint left: " + (!hintUsed ? "Yes" : "No"));
+
+                Console.Write("Hádej písmeno (or type 'hint' for a hint): ");
+                string input = Console.ReadLine().ToLower();
+
+                if (input == "hint" && !hintUsed)
+                {
+                    hintUsed = true;
+                    UseHint(wordToGuess, guessedWord);
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(input) || input.Length > 1 || !Regex.IsMatch(input, @"^[a-zA-Z]+$"))
+                {
+                    continue;
+                }
+
+                char guess = input[0];
 
                 if (wordToGuess.Contains(guess))
                 {
@@ -42,6 +83,7 @@ namespace sibenice
                     }
                 }
             }
+
             Console.Clear();
             if (new string(guessedWord) == wordToGuess)
             {
@@ -56,6 +98,18 @@ namespace sibenice
             else
             {
                 Console.WriteLine("Prohrál jsi. Slovo bylo: " + wordToGuess);
+            }
+        }
+
+        static void UseHint(string wordToGuess, char[] guessedWord)
+        {
+            for (int i = 0; i < wordToGuess.Length; i++)
+            {
+                if (guessedWord[i] == '_')
+                {
+                    guessedWord[i] = wordToGuess[i];
+                    break;
+                }
             }
         }
     }
